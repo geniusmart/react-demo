@@ -1,21 +1,27 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
-import { createStore } from 'redux'
+import { render } from 'react-dom'
+import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
+import thunk from 'redux-thunk'
+import { createLogger } from 'redux-logger'
 
 import App from './components/App'
 import reducer from './reducers'
-import {LOADING,CHANGE} from './actions'
 
-const store = createStore(reducer)
-const rootEl = document.getElementById('root')
+const middleware = [ thunk ]
+if (process.env.NODE_ENV !== 'production') {
+    middleware.push(createLogger())
+}
 
-const render = () => ReactDOM.render(
-  <App name={store.getState().name}
-       onChange = {()=>store.dispatch({type:CHANGE})}
-       onSearch = {(name)=>store.dispatch({type:LOADING},name)} />,
-  rootEl
+const store = createStore(
+    reducer,
+    applyMiddleware(...middleware)
 )
 
-render()
-store.subscribe(render)
+render(
+    <Provider store={store}>
+        <App />
+    </Provider>,
+    document.getElementById('root')
+)
+

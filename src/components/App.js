@@ -1,24 +1,24 @@
-import React,{Component} from 'react'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import {change,search} from '../actions'
 
 class App extends Component{
 
-    //TODO 几种函数写法的区别
     changeName = ()=>{
         console.log("aaaa")
-        this.props.onChange();
+        this.props.dispatch(change());
+
     }
 
     searchName = ()=>{
         //TODO 此处有没有办法复用
-        const {onSearch} = this.props
         let name = this.refs.name.value;
         name = name?name:'geniusmart'
-        //打印当前名称
-        onSearch(name);
+        this.props.dispatch(search(name));
     }
 
     render() {
-        const {name} = this.props
+        const {name,isLoading,datas} = this.props
         return (
             <div>
                 <p>
@@ -29,14 +29,33 @@ class App extends Component{
                     <input type="text" ref="name"/>
                     {'  '}
                     <button onClick={this.searchName}>search</button>
-                    {state.isLoading?'isLoading':''}
+                    {isLoading?'isLoading':''}
                 </p>
                 <p>
                     {'your project: '}<br/>
+                    <ul>
+                        {datas.map((post, i) =>
+                            <li key={i}>{post.name}</li>
+                        )}
+                    </ul>
                 </p>
             </div>
         )
     }
 }
 
-export default App
+const mapStateToProps = state => {
+    return {
+        name : state.name,
+        isLoading : state.isLoading,
+        datas:state.datas
+    }
+}
+
+//const mapDispatchToProps = ( TODO:作用
+
+
+export default connect(mapStateToProps)(App)
+
+
+//TODO 1.对象里成员函数的写法区别 2.dispacth如果没有传递到ui组件要如何处理
